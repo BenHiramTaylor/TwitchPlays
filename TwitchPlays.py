@@ -18,7 +18,7 @@
 
 # General imports
 import time
-import pyautogui
+import pydirectinput
 
 # Twitch imports
 import TwitchPlays_Connection
@@ -26,9 +26,9 @@ from TwitchPlays_AccountInfo import TWITCH_USERNAME, TWITCH_OAUTH_TOKEN
 
 def PressAndHoldKey(Key,Seconds):
     try:
-        pyautogui.keyDown(Key)
+        pydirectinput.keyDown(Key)
         time.sleep(Seconds)
-        pyautogui.keyUp(Key)
+        pydirectinput.keyUp(Key)
     except:
         print(f"Couldn't hold Key: {Key} for {Seconds} seconds.")
 
@@ -66,7 +66,7 @@ while True:
 
                 #TODO ADD ALL KEYS YOU WISH TO TRIGGER ON MESSAGES HERE
                 if msg in keysToPress:
-                    pyautogui.press(msg)
+                    pydirectinput.press(msg)
 
                 if msg == "drive":
                     PressAndHoldKey("W",3)
