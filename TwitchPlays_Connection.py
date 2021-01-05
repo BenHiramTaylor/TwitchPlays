@@ -15,8 +15,10 @@ class Twitch:
     s = None
 
     def twitch_login_status(self, data):
-        if not re.match(r'^:(testserver\.local|tmi\.twitch\.tv) NOTICE \* :Login unsuccessful\r\n$', data): return True
-        else: return False
+        if not re.match(r'^:(testserver\.local|tmi\.twitch\.tv) NOTICE \* :Login unsuccessful\r\n$'.encode("utf-8"), data):
+            return True
+        else:
+            return False
 
     def twitch_connect(self, user, key):
         self.user = user
@@ -33,9 +35,9 @@ class Twitch:
             sys.exit()
         print("Connected to twitch")
         print("Sending our details to twitch...")
-        s.send('USER %s\r\n' % user)
-        s.send('PASS %s\r\n' % key)
-        s.send('NICK %s\r\n' % user)
+        s.send(f'USER {user}\r\n'.encode("utf-8"))
+        s.send(f'PASS {key}\r\n'.encode("utf-8"))
+        s.send(f'NICK {user}\r\n'.encode("utf-8"))
 
         if not self.twitch_login_status(s.recv(1024)):
             print("... and they didn't accept our details")
@@ -44,23 +46,28 @@ class Twitch:
             print("... they accepted our details")
             print("Connected to twitch.tv!")
             self.s = s
-            s.send('JOIN #%s\r\n' % user)
-            s.recv(1024)
+            s.send(f'JOIN #{user}\r\n'.encode("utf-8"))
+            if s.recv(1024).decode() == "PING :tmi.twitch.tv\r\n":
+                print("pong")
+                s.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+
 
     def check_has_message(self, data):
-        return re.match(r'^:[a-zA-Z0-9_]+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+(\.tmi\.twitch\.tv|\.testserver\.local) PRIVMSG #[a-zA-Z0-9_]+ :.+$', data)
+        return re.match(r'^:[a-zA-Z0-9_]+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+(\.tmi\.twitch\.tv|\.testserver\.local) PRIVMSG #[a-zA-Z0-9_]+ :.+$'.encode("utf-8"), data)
 
     def parse_message(self, data):
         return {
-            'channel': re.findall(r'^:.+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+.+ PRIVMSG (.*?) :', data)[0],
-            'username': re.findall(r'^:([a-zA-Z0-9_]+)\!', data)[0],
+            'channel': re.findall(r'^:.+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+.+ PRIVMSG (.*?) :'.encode("utf-8"), data)[0],
+            'username': re.findall(r'^:([a-zA-Z0-9_]+)\!'.encode("utf-8"), data)[0],
             'message': re.findall(r'PRIVMSG #[a-zA-Z0-9_]+ :(.+)', data)[0].decode('utf8')
         }
 
     def twitch_recieve_messages(self, amount=1024):
         data = None
-        try: data = self.s.recv(1024)
-        except: return False
+        try:
+            data = self.s.recv(1024)
+        except:
+            return False
 
         if not data:
             print("Lost connection to Twitch, attempting to reconnect...")
