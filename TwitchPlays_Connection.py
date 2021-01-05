@@ -56,11 +56,18 @@ class Twitch:
         return re.match(r'^:[a-zA-Z0-9_]+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+(\.tmi\.twitch\.tv|\.testserver\.local) PRIVMSG #[a-zA-Z0-9_]+ :.+$'.encode("utf-8"), data)
 
     def parse_message(self, data):
-        return {
-            'channel': re.findall(r'^:.+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+.+ PRIVMSG (.*?) :'.encode("utf-8"), data)[0],
-            'username': re.findall(r'^:([a-zA-Z0-9_]+)\!'.encode("utf-8"), data)[0],
-            'message': re.findall(r'PRIVMSG #[a-zA-Z0-9_]+ :(.+)', data)[0].decode('utf8')
-        }
+        channel = re.findall(r'^:.+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+.+ PRIVMSG (.*?) :', data)
+        username = re.findall(r'^:([a-zA-Z0-9_]+)\!', data)
+        message = re.findall(r'PRIVMSG #[a-zA-Z0-9_]+ :(.+)', data)
+        if len(message):
+            msg = {
+                'channel': channel[0],
+                'username': username[0],
+                'message': message[0]
+            }
+            return msg
+        else:
+            return None
 
     def twitch_recieve_messages(self, amount=1024):
         data = None
@@ -77,4 +84,11 @@ class Twitch:
         #self.ping(data)
 
         if self.check_has_message(data):
-            return [self.parse_message(line) for line in filter(None, data.split('\r\n'))]
+            formattedMsgs = []
+            data = data.decode()
+            for line in data.split('\r\n'):
+                obj = self.parse_message(line)
+                if obj:
+                    formattedMsgs.append(obj)
+
+            return formattedMsgs
