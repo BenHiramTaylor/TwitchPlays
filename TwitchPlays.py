@@ -62,7 +62,7 @@ while True:
                 keysToPress = ["a"]
 
                 # PRINTS MESSAGE FOR DEBUGGING AND ENSURING ALL WORKS FINE
-                print(msg)
+                # print(msg)
 
                 #TODO ADD ALL KEYS YOU WISH TO TRIGGER ON MESSAGES HERE
                 if msg in keysToPress:
@@ -70,6 +70,7 @@ while True:
 
                 if msg == "drive":
                     PressAndHoldKey("W",3)
-        except:
+        except Exception as e:
             # There was some error trying to process this chat message. Simply move on to the next message.
+            print(e)
             print('Encountered an exception while reading chat.')
