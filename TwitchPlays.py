@@ -42,12 +42,12 @@ while countdown > 0:
 
 # Connects to your twitch chat, using your username and OAuth token.
 # TODO: make sure that your Twitch username and OAuth token are added to the "TwitchPlays_AccountInfo.py" file
-t = TwitchPlays_Connection.Twitch();
-t.twitch_connect(TWITCH_USERNAME, TWITCH_OAUTH_TOKEN);
+t = TwitchPlays_Connection.Twitch()
+t.twitch_connect(TWITCH_USERNAME, TWITCH_OAUTH_TOKEN)
 
 while True:
     # Check for new chat messages
-    new_messages = t.twitch_recieve_messages();
+    new_messages = t.twitch_recieve_messages()
     if not new_messages:
         #No new messages. 
         continue
